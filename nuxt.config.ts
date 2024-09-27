@@ -12,11 +12,11 @@ export default defineNuxtConfig({
             'Protest Guerrilla': true
         }
     },
-    modules: ['@nuxtjs/google-fonts'],
     build: {
         transpile: ['vuetify'],
     },
     modules: [
+        '@nuxtjs/google-fonts',
         (_options, nuxt) => {
             nuxt.hooks.hook('vite:extendConfig', (config) => {
                 // @ts-expect-error
