@@ -1,5 +1,5 @@
 <template>
-    <h1 class="bar-title" @click="useRouter().push(Paths.home)">Finanalyze</h1>
+    <h1 class="bar-title" @click="useRouter().push(Paths.home)">Tones</h1>
 </template>
 
 <script setup>

@@ -1,7 +1,9 @@
 <template>
-    <NuxtLayout>
+    <v-responsive class="rounded" style="height: calc(100vh - 0px);">
         <v-app>
-            <NuxtPage />
+            <NuxtLayout>
+                <NuxtPage />
+            </NuxtLayout>
         </v-app>
-    </NuxtLayout>
+    </v-responsive>
 </template>
