@@ -1,5 +1,5 @@
 <template>
-    <v-responsive class="rounded" style="height: calc(100vh - 0px);">
+    <v-responsive class="" style="height: calc(100vh - 0px);">
         <v-app>
             <NuxtLayout>
                 <NuxtPage />
