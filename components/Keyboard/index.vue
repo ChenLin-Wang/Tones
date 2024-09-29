@@ -10,7 +10,6 @@ function generateNumbers(start: number, end: number): number[] {
     return [start, ...generateNumbers(start + 1, end)];
 }
 
-var keys: NodeListOf<HTMLDivElement>
 var whiteKeys: HTMLElement[]
 var blackSharpKeys: HTMLElement[]
 var blackFlapKeys: HTMLElement[]
@@ -19,21 +18,21 @@ var mousePressed = false
 
 onMounted(() => {
     nextTick(() => {
-        keys = document.querySelectorAll('div')
-        whiteKeys = Array.from(keys).filter( div => /^\d{1,2}$/.test(div.id) )
-        blackSharpKeys = Array.from(keys).filter( div => /^1\d{2}$/.test(div.id) )
-        blackFlapKeys = Array.from(keys).filter( div => /^2\d{2}$/.test(div.id) )
+        whiteKeys = Array.from(document.querySelectorAll('.key-white-field'));
+        blackSharpKeys = Array.from(document.querySelectorAll('.key-black-field-left'));
+        blackFlapKeys = Array.from(document.querySelectorAll('.key-black-field-right'));
         for (const key of [...whiteKeys, ...blackSharpKeys, ...blackFlapKeys]) {
-            key.addEventListener('mouseenter', mouseEnter)
-            key.addEventListener('mouseleave', mouseLeave)
-            key.addEventListener('mousedown', mouseDown)
-            key.addEventListener('mouseup', mouseUp)
+            key.addEventListener('mouseenter', mouseEnter, true)
+            key.addEventListener('mouseleave', mouseLeave, true)
+            key.addEventListener('mousedown', mouseDown, true)
+            key.addEventListener('mouseup', mouseUp, true)
         }
     })
 })
 
 const pressKey = (e: MouseEvent) => {
-    const k = e.target as HTMLElement
+    const k = e.currentTarget as HTMLElement
+    // console.log(k)
     if (mousePressed && k.getAttribute("pressed") === null) {
         k.setAttribute("pressed", "t")
         attack(e)
@@ -42,7 +41,8 @@ const pressKey = (e: MouseEvent) => {
 }
 
 const releaseKey = (e: MouseEvent) => {
-    const k = e.target as HTMLElement
+    const k = e.currentTarget as HTMLElement
+    // console.log(`mouse releasing: ${k.id}`)
     if (k.getAttribute("pressed")) {
         k.removeAttribute("pressed")
         release(e)
@@ -51,63 +51,67 @@ const releaseKey = (e: MouseEvent) => {
 }
 
 const mouseEnter = (e: MouseEvent) => {
-    const k = e.target as HTMLElement
+    const k = e.currentTarget as HTMLElement
     pressKey(e)
     // console.log(`mouse enter: ${k.id}`)
 }
 
 const mouseLeave = (e: MouseEvent) => {
-    const k = e.target as HTMLElement
+    const k = e.currentTarget as HTMLElement
     releaseKey(e)
     // console.log(`mouse leave: ${k.id}`)
 }
 
 const mouseDown = (e: MouseEvent) => {
-    const k = e.target as HTMLElement
+    const k = e.currentTarget as HTMLElement
     mousePressed = true
     pressKey(e)
     // console.log(`mouse down: ${k.id}`)
 }
 
 const mouseUp = (e: MouseEvent) => {
-    const k = e.target as HTMLElement
+    const k = e.currentTarget as HTMLElement
     mousePressed = false
     releaseKey(e)
     // console.log(`mouse up: ${k.id}`)
 }
 
 const attack = (e?: MouseEvent, note?: string) => {
+    var dom: HTMLElement
     if (e) {
-        const dom = e.target as HTMLElement
-        if (dom.classList.contains("key-black-field-left-pressed")) return
-        if (dom.id.length === 3) {
-            // black keys
-            if (dom.id.startsWith("1")) dom.classList.add("key-black-field-left-pressed") // #
-            else dom.classList.add("key-black-field-right-pressed") // b
-        } else dom.classList.add("key-white-field-pressed") // white keys
-    } else if (note) {
-
+        dom = e.currentTarget as HTMLElement
+    } else {
+        const n = note as string
+        dom = (n.length < 3 ? whiteKeys : n.startsWith("1") ? blackSharpKeys : blackFlapKeys).filter(key => key.id === note)[0]
     }
+    if (dom.classList.contains("key-black-field-left-pressed")) return
+    if (dom.id.length === 3) {
+        // black keys
+        if (dom.id.startsWith("1")) dom.classList.add("key-black-field-left-pressed") // #
+        else dom.classList.add("key-black-field-right-pressed") // b
+    } else dom.classList.add("key-white-field-pressed") // white keys
 }
 
 const release = (e?: MouseEvent, note?: string) => {
+    var dom: HTMLElement
     if (e) {
-        const dom = e.target as HTMLElement
-        if (dom.id.length === 3) {
-            // black keys
-            if (dom.id.startsWith("1")) dom.classList.remove("key-black-field-left-pressed") // #
-            else dom.classList.remove("key-black-field-right-pressed") // b
-        } else dom.classList.remove("key-white-field-pressed") // white keys
-    } else if (note) {
-
+        dom = e.currentTarget as HTMLElement
+    } else {
+        const n = note as string
+        dom = (n.length < 3 ? whiteKeys : n.startsWith("1") ? blackSharpKeys : blackFlapKeys).filter(key => key.id === note)[0]
     }
+    if (dom.id.length === 3) {
+        // black keys
+        if (dom.id.startsWith("1")) dom.classList.remove("key-black-field-left-pressed") // #
+        else dom.classList.remove("key-black-field-right-pressed") // b
+    } else dom.classList.remove("key-white-field-pressed") // white keys
 }
 
 </script>
 
 <template>
     <ClientOnly>
-        <v-container id="border" fluid class="border bg-black px-8 py-8">
+        <v-container fluid class="border bg-black px-8 py-8">
             <v-container fluid class="scrollview ma-0 pa-0">
                 <v-row no-gutters>
                     <tbody>
@@ -129,8 +133,15 @@ const release = (e?: MouseEvent, note?: string) => {
                     <tbody>
                         <tr class="white-keys">
                             <td class="white-key pa-0" v-for="i in generateNumbers(1, 52)">
-                                <div :id="i.toString()"
-                                    class="key-white-field fill-height" />
+                                <div :id="i.toString()" class="key-white-field text-black fill-height">
+                                    <v-row class="fill-height pb-3" no-gutters align="end">
+                                        <v-col align="center">
+                                            <p
+                                                :class="`pa-0 shortcut-label text-center ${barColors[Math.floor((i + (6 - keyOffset)) / 7)]}`">
+                                                a</p>
+                                        </v-col>
+                                    </v-row>
+                                </div>
                             </td>
                         </tr>
                         <tr class="black-keys">
@@ -138,12 +149,26 @@ const release = (e?: MouseEvent, note?: string) => {
                                 <v-row class="fill-height pa-0 ma-0"
                                     v-if="blackKeyIndex.includes((i + (7 - keyOffset)) % 7)" no-gutters>
                                     <v-col class="pa-0 ma-0">
-                                        <div :id="(i + 100).toString()"
-                                            class="key-black-field-left fill-height" />
+                                        <div :id="(i + 100).toString()" class="key-black-field-left fill-height">
+                                            <v-row class="fill-height pb-3" no-gutters align="end">
+                                                <v-col align="center">
+                                                    <p
+                                                        :class="`pa-0 shortcut-label-black-left text-center ${barColors[Math.floor((i + (6 - keyOffset)) / 7)]}`">
+                                                        a</p>
+                                                </v-col>
+                                            </v-row>
+                                        </div>
                                     </v-col>
                                     <v-col class="pa-0 ma-0">
-                                        <div :id="(i + 200).toString()"
-                                            class="key-black-field-right fill-height" />
+                                        <div :id="(i + 200).toString()" class="key-black-field-right fill-height">
+                                            <v-row class="fill-height pb-3" no-gutters align="end">
+                                                <v-col align="center">
+                                                    <p
+                                                        :class="`pa-0 shortcut-label-black-right text-center ${barColors[Math.floor((i + (6 - keyOffset)) / 7)]}`">
+                                                        a</p>
+                                                </v-col>
+                                            </v-row>
+                                        </div>
                                     </v-col>
                                 </v-row>
                             </td>
@@ -163,6 +188,7 @@ const release = (e?: MouseEvent, note?: string) => {
     --white-key-width: calc(var(--key-width) * 1 - var(--key-gap));
     --black-key-width: calc(var(--key-width) * 0.40 - var(--key-gap));
     --black-key-height: calc(var(--white-key-height) * 0.6);
+    --key-label-width: calc(var(--key-width) / 2);
     border-radius: 20px;
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 1);
 }
@@ -261,7 +287,7 @@ const release = (e?: MouseEvent, note?: string) => {
     border-bottom-right-radius: 10px;
     border-bottom-left-radius: 10px;
     width: var(--white-key-width);
-    background-color: gray;
+    background-color: cyan;
 }
 
 .key-black-field-left {
@@ -306,5 +332,55 @@ const release = (e?: MouseEvent, note?: string) => {
     border-bottom-left-radius: 0px;
     background-color: purple;
     width: var(--black-key-width);
+}
+
+.shortcut-label {
+    border-radius: 10px;
+    width: var(--key-label-width);
+    font-family: var(--brand-title);
+    user-select: none;
+    /* Standard syntax */
+    -webkit-user-select: none;
+    /* Safari */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
+}
+
+.shortcut-label-black-left {
+    border-top-right-radius: 0px;
+    border-top-left-radius: 10px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 10px;
+    width: calc(var(--black-key-width) - var(--key-gap));
+    font-family: var(--brand-title);
+    user-select: none;
+    margin-left: var(--key-gap);
+    /* Standard syntax */
+    -webkit-user-select: none;
+    /* Safari */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
+}
+
+.shortcut-label-black-right {
+    border-top-right-radius: 10px;
+    border-top-left-radius: 0px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 0px;
+    width: calc(var(--black-key-width) - var(--key-gap));
+    font-family: var(--brand-title);
+    user-select: none;
+    margin-right: var(--key-gap);
+    /* Standard syntax */
+    -webkit-user-select: none;
+    /* Safari */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
 }
 </style>
