@@ -4,6 +4,11 @@ const scrollIndex = ref({i: 3, d: true})
 var border: HTMLElement
 const keyboard = ref(null)
 
+const emit = defineEmits<{
+    (e: 'attack', note: string): void;
+    (e: 'release', note: string): void;
+}>()
+
 onMounted(() => {
     nextTick(() => {
         border = document.querySelectorAll('.border')[0] as HTMLElement;
@@ -24,19 +29,19 @@ const nextBar = () => {
 }
 
 const keyDown = (e: KeyboardEvent) => {
-    console.log(e.key)
-    if (e.key === "ArrowLeft") {
-        previousBar()
-    } else if (e.key === "ArrowRight") {
-        nextBar()
-    } else {
-        (keyboard.value as any).keyDown(e.key)
-    }
+    if (e.key === "ArrowLeft") previousBar()
+    else if (e.key === "ArrowRight") nextBar()
+    else (keyboard.value as any).keyDown(e.key)
 }
 
 const keyUp = (e: KeyboardEvent) => {
     (keyboard.value as any).keyUp(e.key)
 }
+
+defineExpose(() => {
+    (keyboard.value as any).attack,
+    (keyboard.value as any).release
+})
 
 </script>
 
@@ -50,7 +55,7 @@ const keyUp = (e: KeyboardEvent) => {
                 </v-btn>
             </v-col>
             <v-col class="px-1 ma-0" style="width: calc(100% - 80px);">
-                <KeyboardKeys ref="keyboard" v-model:scroll-index="scrollIndex" />
+                <KeyboardKeys @attack="(note: string) => { emit('attack', note) }" @release="(note: string) => { emit('release', note) }" ref="keyboard" v-model:scroll-index="scrollIndex" />
             </v-col>
             <v-col class="ma-0" style="width: 40px;">
                 <v-btn @click="nextBar" class="fill-height" style="min-width: 100%; max-width: 100%;">

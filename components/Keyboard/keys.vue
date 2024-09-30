@@ -10,6 +10,10 @@ const whiteShortKeys = "12345ASDFGHJKL;'67890"
 const blackLeftShortKeys = "     qw rt uio [] "
 const blackRightShortKeys = "      z cv nm, / "
 const scrollOffset = 0
+const emit = defineEmits<{
+    (e: 'attack', note: string): void;
+    (e: 'release', note: string): void;
+}>()
 
 function generateNumbers(start: number, end: number): number[] {
     if (start > end) return [];
@@ -60,7 +64,7 @@ const scrollAdjust = (live: boolean = true) => {
         scrollView.scrollLeft = ((scrollIndex.value?.i ?? 4) * 7 + scrollOffset) * 60
         update = true
     } else {
-        console.log(`${scrollIndex.value?.i}, ${Math.round((scrollView.scrollLeft / 60 - scrollOffset) / 7)}`)
+        // console.log(`${scrollIndex.value?.i}, ${Math.round((scrollView.scrollLeft / 60 - scrollOffset) / 7)}`)
         if (scrollIndex.value && scrollIndex.value?.i !== (Math.round((scrollView.scrollLeft / 60 - scrollOffset) / 7))) {
             scrollIndex.value.i = Math.round((scrollView.scrollLeft / 60 - scrollOffset) / 7)
             scrollIndex.value.d = false
@@ -100,7 +104,38 @@ const keyUp = (k: string) => {
     }
 }
 
-defineExpose({ keyDown, keyUp })
+const attack = (e?: HTMLElement, note?: string) => {
+    var dom = e
+    if (!dom) {
+        const n = note as string
+        dom = (n.length < 3 ? whiteKeys : n.startsWith("1") ? blackSharpKeys : blackFlapKeys).filter(key => key.id === note)[0]
+    }
+    // console.log(`attack: ${dom.id}`)
+    if (dom.classList.contains("key-black-field-left-pressed")) return
+    if (dom.id.length === 3) {
+        // black keys
+        if (dom.id.startsWith("1")) dom.classList.add("key-black-field-left-pressed") // #
+        else dom.classList.add("key-black-field-right-pressed") // b
+    } else dom.classList.add("key-white-field-pressed") // white keys
+    emit('attack', dom.id)
+}
+
+const release = (e?: HTMLElement, note?: string) => {
+    var dom = e
+    if (!dom) {
+        const n = note as string
+        dom = (n.length < 3 ? whiteKeys : n.startsWith("1") ? blackSharpKeys : blackFlapKeys).filter(key => key.id === note)[0]
+    }
+    // console.log(`release: ${dom.id}`)
+    if (dom.id.length === 3) {
+        // black keys
+        if (dom.id.startsWith("1")) dom.classList.remove("key-black-field-left-pressed") // #
+        else dom.classList.remove("key-black-field-right-pressed") // b
+    } else dom.classList.remove("key-white-field-pressed") // white keys
+    emit('release', dom.id)
+}
+
+defineExpose({ keyDown, keyUp, attack, release })
 
 const labelUpdate = () => {
     // console.log(scrollIndex.value?.i)
@@ -167,39 +202,6 @@ const mouseUp = (e: MouseEvent) => {
     mousePressed = false
     releaseKey(e)
     // console.log(`mouse up: ${k.id}`)
-}
-
-const attack = (e?: HTMLElement, note?: string) => {
-    var dom: HTMLElement
-    if (e) {
-        dom = e
-    } else {
-        const n = note as string
-        dom = (n.length < 3 ? whiteKeys : n.startsWith("1") ? blackSharpKeys : blackFlapKeys).filter(key => key.id === note)[0]
-    }
-    // console.log(`attack: ${dom.id}`)
-    if (dom.classList.contains("key-black-field-left-pressed")) return
-    if (dom.id.length === 3) {
-        // black keys
-        if (dom.id.startsWith("1")) dom.classList.add("key-black-field-left-pressed") // #
-        else dom.classList.add("key-black-field-right-pressed") // b
-    } else dom.classList.add("key-white-field-pressed") // white keys
-}
-
-const release = (e?: HTMLElement, note?: string) => {
-    var dom: HTMLElement
-    if (e) {
-        dom = e
-    } else {
-        const n = note as string
-        dom = (n.length < 3 ? whiteKeys : n.startsWith("1") ? blackSharpKeys : blackFlapKeys).filter(key => key.id === note)[0]
-    }
-    // console.log(`release: ${dom.id}`)
-    if (dom.id.length === 3) {
-        // black keys
-        if (dom.id.startsWith("1")) dom.classList.remove("key-black-field-left-pressed") // #
-        else dom.classList.remove("key-black-field-right-pressed") // b
-    } else dom.classList.remove("key-white-field-pressed") // white keys
 }
 
 </script>

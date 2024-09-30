@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const { $tone } = useNuxtApp()
 
 
@@ -20,6 +20,15 @@ const playSound = () => {
     // ramp up to 800 bpm over 10 seconds
     $tone.getTransport().bpm.rampTo(800, 10);
 }
+
+const attack = (note: string) => {
+    console.log(`attack: ${note}`)
+}
+
+const release = (note: string) => {
+    console.log(`release: ${note}`)
+}
+
 </script>
 
 <template>
@@ -31,7 +40,7 @@ const playSound = () => {
             <button @click="playSound">Play Sound</button>
         </v-row>
         <v-row>
-            <Keyboard style="overflow: visible;" />
+            <Keyboard @attack="attack" @release="release" style="overflow: visible;" />
         </v-row>
     </v-container>
 </template>
