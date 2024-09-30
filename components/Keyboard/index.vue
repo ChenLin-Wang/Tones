@@ -30,12 +30,12 @@ const keyDown = (e: KeyboardEvent) => {
     } else if (e.key === "ArrowRight") {
         nextBar()
     } else {
-        keyboard.value?.keyDown(e.key)
+        (keyboard.value as any).keyDown(e.key)
     }
 }
 
 const keyUp = (e: KeyboardEvent) => {
-    keyboard.value?.keyUp(e.key)
+    (keyboard.value as any).keyUp(e.key)
 }
 
 </script>
