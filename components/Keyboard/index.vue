@@ -1,6 +1,18 @@
 <script setup lang="ts">
 const scrollIndex = ref({i: 3, d: true})
 
+var border: HTMLElement
+const keyboard = ref(null)
+
+onMounted(() => {
+    nextTick(() => {
+        border = document.querySelectorAll('.border')[0] as HTMLElement;
+        console.log(keyboard.value)
+        border.addEventListener('keydown', keyboard.value?.keyDown)
+        border.addEventListener('keyup', keyboard.value?.keyUp)
+    })
+})
+
 const previousBar = () => {
     const v = Math.floor(scrollIndex.value.i)
     scrollIndex.value = {i: v - 1 < 0 ? 0 : v - 1, d: true}
@@ -10,10 +22,12 @@ const nextBar = () => {
     const v = Math.floor(scrollIndex.value.i)
     scrollIndex.value = {i: v + 1 > 7 ? 7 : v + 1, d: true}
 }
+
 </script>
 
 <template>
-    <v-container fluid class="border pa-5 bg-black">
+    <ClientOnly>
+    <v-container fluid tabindex="1" class="border pa-5 bg-black">
         <v-row no-gutters>
             <v-col class="ma-0" style="width: 40px;">
                 <v-btn @click="previousBar" class="fill-height pa-0 ma-0" style="min-width: 100%; max-width: 100%;">
@@ -21,7 +35,7 @@ const nextBar = () => {
                 </v-btn>
             </v-col>
             <v-col class="px-1 ma-0" style="width: calc(100% - 80px);">
-                <KeyboardKeys v-model:scroll-index="scrollIndex" />
+                <KeyboardKeys ref="keyboard" v-model:scroll-index="scrollIndex" />
             </v-col>
             <v-col class="ma-0" style="width: 40px;">
                 <v-btn @click="nextBar" class="fill-height" style="min-width: 100%; max-width: 100%;">
@@ -30,6 +44,7 @@ const nextBar = () => {
             </v-col>
         </v-row>
     </v-container>
+</ClientOnly>
 </template>
 
 <style lang="css" scoped>
