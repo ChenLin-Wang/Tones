@@ -8,8 +8,8 @@ onMounted(() => {
     nextTick(() => {
         border = document.querySelectorAll('.border')[0] as HTMLElement;
         console.log(keyboard.value)
-        border.addEventListener('keydown', keyboard.value?.keyDown)
-        border.addEventListener('keyup', keyboard.value?.keyUp)
+        border.addEventListener('keydown', keyDown)
+        border.addEventListener('keyup', keyUp)
     })
 })
 
@@ -21,6 +21,21 @@ const previousBar = () => {
 const nextBar = () => {
     const v = Math.floor(scrollIndex.value.i)
     scrollIndex.value = {i: v + 1 > 7 ? 7 : v + 1, d: true}
+}
+
+const keyDown = (e: KeyboardEvent) => {
+    console.log(e.key)
+    if (e.key === "ArrowLeft") {
+        previousBar()
+    } else if (e.key === "ArrowRight") {
+        nextBar()
+    } else {
+        keyboard.value?.keyDown(e.key)
+    }
+}
+
+const keyUp = (e: KeyboardEvent) => {
+    keyboard.value?.keyUp(e.key)
 }
 
 </script>

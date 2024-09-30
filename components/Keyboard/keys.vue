@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-const scrollIndex = defineModel<{i: number, d: boolean}>("scrollIndex")
+const scrollIndex = defineModel<{ i: number, d: boolean }>("scrollIndex")
 
 const keyOffset = 2
 const blackKeyIndex = [0, 2, 3, 5, 6]
@@ -53,37 +53,49 @@ onMounted(() => {
 })
 
 const scrollAdjust = (live: boolean = true) => {
-    const position = scrollView.scrollLeft
-    const scrollI = scrollIndex.value?.i
-    if (live) scrollView.scrollLeft = ((scrollIndex.value?.i ?? 4) * 7 + scrollOffset) * 60
-    else {
-        scrollIndex.
-        value = { i: (scrollView.scrollLeft / 60 - scrollOffset) / 7, d: false }
-        console.log(`${scrollI}, ${(position / 60 - scrollOffset) / 7}`)
-    }
-    if (Math.floor(scrollI ?? 3) !== Math.round((position / 60 - scrollOffset) / 7)) {
-            // console.log(keyPressed)
-            labelUpdate()
-            keyUp()
+    // const position = scrollView.scrollLeft
+    // const scrollI = scrollIndex.value?.i
+    var update = false
+    if (live) {
+        scrollView.scrollLeft = ((scrollIndex.value?.i ?? 4) * 7 + scrollOffset) * 60
+        update = true
+    } else {
+        console.log(`${scrollIndex.value?.i}, ${Math.round((scrollView.scrollLeft / 60 - scrollOffset) / 7)}`)
+        if (scrollIndex.value && scrollIndex.value?.i !== (Math.round((scrollView.scrollLeft / 60 - scrollOffset) / 7))) {
+            scrollIndex.value.i = Math.round((scrollView.scrollLeft / 60 - scrollOffset) / 7)
+            scrollIndex.value.d = false
+            // console.log(`test: ${scrollIndex.value.i}, ${Math.round((scrollView.scrollLeft / 60 - scrollOffset) / 7)}`)
+            update = true
         }
+    }
+
+    if (update) {
+        const ks = keyPressed
+        for (const k of ks) keyUp(k)
+        labelUpdate()
+        for (const k of ks) keyDown(k)
+    }
 }
 
-const keyDown = (e: KeyboardEvent) => {
+const keyDown = (k: string) => {
     for (const l of [...whiteLabels, ...blackLeftLabels, ...blackRightLabels]) {
-        if (l.textContent?.toLowerCase() === e.key.toLowerCase() && !keyPressed.includes(e.key.toLowerCase())) {
+        if (l.textContent?.toLowerCase() === k.toLowerCase() && !keyPressed.includes(k.toLowerCase())) {
             // console.log(`key down: ${l.textContent}`)
             attack(undefined, l.id)
-            keyPressed.push(e.key.toLowerCase())
+            keyPressed.push(k.toLowerCase())
         }
     }
 }
 
-const keyUp = (e?: KeyboardEvent) => {
+const keyUp = (k: string) => {
+    // console.log(k)
     for (const l of [...whiteLabels, ...blackLeftLabels, ...blackRightLabels]) {
-        if (e === undefined || l.textContent?.toLowerCase() === e.key.toLowerCase()) {
+        if (l.textContent?.toLowerCase() === k.toLowerCase()) {
             // console.log(`key up: ${l.textContent}`)
             release(undefined, l.id)
-            if (e) keyPressed = keyPressed.filter(s => s !== e.key.toLowerCase())
+            // console.log(`1. ${keyPressed}, ${k.toLowerCase()}`)
+            keyPressed = keyPressed.filter(s => s !== k.toLowerCase())
+            // console.log(`2. ${keyPressed}`)
         }
     }
 }
@@ -91,7 +103,8 @@ const keyUp = (e?: KeyboardEvent) => {
 defineExpose({ keyDown, keyUp })
 
 const labelUpdate = () => {
-    var startI = (Math.round(scrollIndex.value?.i ?? 3)) * 7 - 4
+    // console.log(scrollIndex.value?.i)
+    var startI = (scrollIndex.value?.i ?? 3) * 7 - 4
     for (const wl of whiteLabels) {
         const i = parseInt(wl.id) - startI
         if (i >= 0 && whiteShortKeys[i] !== "") {
@@ -164,6 +177,7 @@ const attack = (e?: HTMLElement, note?: string) => {
         const n = note as string
         dom = (n.length < 3 ? whiteKeys : n.startsWith("1") ? blackSharpKeys : blackFlapKeys).filter(key => key.id === note)[0]
     }
+    // console.log(`attack: ${dom.id}`)
     if (dom.classList.contains("key-black-field-left-pressed")) return
     if (dom.id.length === 3) {
         // black keys
@@ -180,6 +194,7 @@ const release = (e?: HTMLElement, note?: string) => {
         const n = note as string
         dom = (n.length < 3 ? whiteKeys : n.startsWith("1") ? blackSharpKeys : blackFlapKeys).filter(key => key.id === note)[0]
     }
+    // console.log(`release: ${dom.id}`)
     if (dom.id.length === 3) {
         // black keys
         if (dom.id.startsWith("1")) dom.classList.remove("key-black-field-left-pressed") // #
