@@ -208,7 +208,7 @@ const mouseUp = (e: MouseEvent) => {
 
 <template>
     <ClientOnly>
-        <v-container fluid tabindex="1" class="scrollview ma-0 pa-0">
+        <v-container fluid class="scrollview ma-0 pa-0">
             <v-row no-gutters>
                 <tbody>
                     <tr>
