@@ -123,7 +123,7 @@ export const getFreqs = (tones: string[]): number[][] => {
         const tempK = t.slice(0, -1)
         const { flap, key } = toneShift(tempK)
         const octaveGap = Math.pow(2, parseInt(t[t.length - 1]) - octaves[Key[tempK as keyof typeof Key]])
-        console.log(`${t.slice(0, -1)}, ${flap}, ${allKeys[key]}, ${Math.pow(2, parseInt(t[t.length - 1]) - octaves[Key[tempK as keyof typeof Key]])}`)
+        // console.log(`${t.slice(0, -1)}, ${flap}, ${allKeys[key]}, ${Math.pow(2, parseInt(t[t.length - 1]) - octaves[Key[tempK as keyof typeof Key]])}`)
         if (basicKeys.includes(allKeys[key] as keyof BasicInotonationSequence)) {
             basicTones.push(key)
             var ts: number[] = []
@@ -178,6 +178,8 @@ export const getFreqs = (tones: string[]): number[][] => {
                         freq *= minGap > 0 ? inot.intervals.ins[i] : 1 / inot.intervals.ins[i]
                     }
                     ts.push(freq / (flap ? 2 : 1) * oct)
+                } else if (inot.basicFreqs) {
+                    ts.push(inot.intervals.ins[1] * inot.basicFreqs[allKeys[s - 1] as keyof BasicFreqs] / (flap ? 2 : 1) * oct)
                 }
             } else {
                 if (inot.basicFreqs) {
@@ -237,7 +239,7 @@ export const keyShift = (key: Key): void => {
 const toneShift = (tone: string): { flap: boolean, key: Key } => {
     const key = tone as keyof typeof Key
     const gap = Key[key] - baseKey
-    console.log(allKeys[baseKey])
+    // console.log(allKeys[baseKey])
     return gap >= 0 ? { flap: false, key: gap } : { flap: true, key: 12 + gap }
 }
 
@@ -259,16 +261,14 @@ const minCombination = (candidates: number[], target: number): number[] => {
             else ans.push(combine)
             return
         }
-        // 直接跳过
         dfs(target, combine, idx + 1)
-        // 选择当前数
         if (target - candidates[idx] >= 0) {
             dfs(target - candidates[idx], [candidates[idx], ...combine], idx)
         }
     }
     dfs(target, [], 0)
     ans = ans.length > 0 ? ans : s.length > 0 ? s : f
-    console.log(ans)
+    // console.log(ans)
     return ans.filter(a => a.length === smallest).sort((a, b) => b[0] - a[0])[0]
 }
 

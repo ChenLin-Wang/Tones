@@ -8,34 +8,29 @@ definePageMeta({
 })
 
 var synth: Tone.Sampler
+var tones: string[] = []
 
 const attack = (note: string) => {
-    console.log(`attack: ${note}`)
-    synth.triggerAttack([note])
+    if (!tones.includes(note)) tones.push(note)
+    const frqs = getFreqs(tones).map(a => a[0])
+    synth.releaseAll(0)
+    synth.triggerAttack(frqs)
 }
 
 const release = (note: string) => {
     console.log(`release: ${note}`)
+    tones = tones.filter(a => a !== note)
     synth.triggerRelease([note])
 }
 
-
 inotonationInit()
-keyShift(Key.E)
-keyShift(Key["C#"])
-// keyShift(Key["G#"])
-// keyShift(Key.F)
-// keyShift(Key.A)
-console.log(getFreqs(["C3", "Eb4", "G4", "G#4"]))
-// const res = toneShift("Eb")
-// console.log(`${res.flap}, ${allKeys[res.key]}`)
 
 onMounted(() => {
     synth = new Tone.Sampler({
-        urls: Samples.piano.files,
+        urls: Samples.violin.files,
         release: 1,
         // attack: 0.1,
-        baseUrl: 'https://tones.inspiral.site/samples/piano/'
+        baseUrl: 'https://tones.inspiral.site/samples/violin/'
     }).toDestination();
 
     Tone.loaded().then(() => {
@@ -46,9 +41,14 @@ onMounted(() => {
 </script>
 
 <template>
-    <v-container fluid>
+    <v-container fluid style="height: 100vh;">
         <v-row>
-            <Keyboard @attack="attack" @release="release" style="overflow: visible;" />
+            <Settings />
+        </v-row>
+        <v-row class="fill-height" no-gutters align="end" justify="center">
+            <v-col class="pb-10">
+                <Keyboard @attack="attack" @release="release" style="overflow: visible;" />
+            </v-col>
         </v-row>
     </v-container>
 </template>
