@@ -16,6 +16,7 @@ export default defineNuxtConfig({
         transpile: ['vuetify'],
     },
     modules: [
+        'vue-knob-control',
         '@nuxtjs/google-fonts',
         (_options, nuxt) => {
             nuxt.hooks.hook('vite:extendConfig', (config) => {

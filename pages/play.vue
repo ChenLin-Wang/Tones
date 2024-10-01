@@ -41,11 +41,11 @@ onMounted(() => {
 </script>
 
 <template>
-    <v-container fluid style="height: 100vh;">
-        <v-row>
-            <Settings />
+    <v-container fluid style="height: calc(100vh - 80px);">
+        <v-row no-gutters style="height: calc(100% - 330px);">
+            <Settings style="height: 100%" />
         </v-row>
-        <v-row class="fill-height" no-gutters align="end" justify="center">
+        <v-row no-gutters>
             <v-col class="pb-10">
                 <Keyboard @attack="attack" @release="release" style="overflow: visible;" />
             </v-col>

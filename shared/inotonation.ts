@@ -1,6 +1,6 @@
 const basicKeys: (keyof BasicInotonationSequence)[] = ["A", "B", "C", "D", "E", "F", "G"]
-const inotonations: (keyof Inotonation)[] = ["Just", "Equal"]
-const allKeys: ((keyof BasicInotonationSequence) | string)[] = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+export const inotonations: (keyof Inotonation)[] = ["Just", "Equal"]
+export const allKeys: ((keyof BasicInotonationSequence) | string)[] = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
 const octaves = [3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4]
 var baseFreq = 220
 export enum Key {
