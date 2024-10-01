@@ -1,6 +1,6 @@
 const basicKeys: (keyof BasicInotonationSequence)[] = ["A", "B", "C", "D", "E", "F", "G"]
 const inotonations: (keyof Inotonation)[] = ["Just", "Equal"]
-export const allKeys: ((keyof BasicInotonationSequence) | string)[] = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+const allKeys: ((keyof BasicInotonationSequence) | string)[] = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
 const octaves = [3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4]
 var baseFreq = 220
 export enum Key {
@@ -94,7 +94,28 @@ const inotons: Inotonation = {
     }
 }
 
-export const freqs = (tones: string[]): number[][] => {
+export const inotonationInit = (): void => {
+    baseKey = Key.A
+    var basicFs: BasicFreqs[] = []
+    for (const name of inotonations) {
+        inotons[name].dependedKey = "A"
+        inotons[name].offsetRatio = 1
+        basicFs.push({ A: baseFreq, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0 })
+    }
+    for (const key of basicKeys) {
+        if (key === "A") continue
+        for (const i in inotonations) {
+            const freqEcof = inotons[inotonations[i]].basic[key]
+            basicFs[i][key] = basicFs[i][freqEcof[0]] * freqEcof[1]
+        }
+    }
+    for (const i in basicFs) {
+        inotons[inotonations[i]].basicFreqs = basicFs[i]
+    }
+    // console.log(inotons)
+}
+
+export const getFreqs = (tones: string[]): number[][] => {
     var res: number[][] = []
     var basicTones: number[] = []
     var semiTones: ({ oct: number, flap: boolean, tone: number } | null)[] = []
@@ -169,46 +190,8 @@ export const freqs = (tones: string[]): number[][] => {
     return res
 }
 
-export const toneShift = (tone: string): { flap: boolean, key: Key } => {
-    const key = tone as keyof typeof Key
-    const gap = Key[key] - baseKey
-    console.log(allKeys[baseKey])
-    return gap >= 0 ? { flap: false, key: gap } : { flap: true, key: 12 + gap }
-}
-
-export const minCombination = (candidates: number[], target: number): number[] => {
-    var ans: number[][] = []
-    const f: number[][] = []
-    const s: number[][] = []
-    var t = 5
-    var smallest: number | null = null
-    const dfs = (target: number, combine: number[], idx: number) => {
-        if (t === 0) return
-        if (idx === candidates.length) return
-        if (target === 0) {
-            t--
-            if (smallest === null) smallest = combine.length
-            else if (combine.length < smallest) smallest = combine.length
-            if (combine.includes(1)) f.push(combine)
-            else if (combine.includes(2)) s.push(combine)
-            else ans.push(combine)
-            return
-        }
-        // 直接跳过
-        dfs(target, combine, idx + 1)
-        // 选择当前数
-        if (target - candidates[idx] >= 0) {
-            dfs(target - candidates[idx], [candidates[idx], ...combine], idx)
-        }
-    }
-    dfs(target, [], 0)
-    ans = ans.length > 0 ? ans : s.length > 0 ? s : f
-    console.log(ans)
-    return ans.filter(a => a.length === smallest).sort((a, b) => b[0] - a[0])[0]
-}
-
-export const updateBasicInotonations = (key: Key): void => {
-    console.log(`to ${allKeys[key]}`)
+export const keyShift = (key: Key): void => {
+    // console.log(`to ${allKeys[key]}`)
     if (baseKey === key || baseKey === null) return
     for (const i of inotonations) {
         const ino = inotons[i]
@@ -251,25 +234,42 @@ export const updateBasicInotonations = (key: Key): void => {
     baseKey = key
 }
 
-export const init = (): void => {
-    baseKey = Key.A
-    var basicFs: BasicFreqs[] = []
-    for (const name of inotonations) {
-        inotons[name].dependedKey = "A"
-        inotons[name].offsetRatio = 1
-        basicFs.push({ A: baseFreq, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0 })
-    }
-    for (const key of basicKeys) {
-        if (key === "A") continue
-        for (const i in inotonations) {
-            const freqEcof = inotons[inotonations[i]].basic[key]
-            basicFs[i][key] = basicFs[i][freqEcof[0]] * freqEcof[1]
+const toneShift = (tone: string): { flap: boolean, key: Key } => {
+    const key = tone as keyof typeof Key
+    const gap = Key[key] - baseKey
+    console.log(allKeys[baseKey])
+    return gap >= 0 ? { flap: false, key: gap } : { flap: true, key: 12 + gap }
+}
+
+const minCombination = (candidates: number[], target: number): number[] => {
+    var ans: number[][] = []
+    const f: number[][] = []
+    const s: number[][] = []
+    var t = 5
+    var smallest: number | null = null
+    const dfs = (target: number, combine: number[], idx: number) => {
+        if (t === 0) return
+        if (idx === candidates.length) return
+        if (target === 0) {
+            t--
+            if (smallest === null) smallest = combine.length
+            else if (combine.length < smallest) smallest = combine.length
+            if (combine.includes(1)) f.push(combine)
+            else if (combine.includes(2)) s.push(combine)
+            else ans.push(combine)
+            return
+        }
+        // 直接跳过
+        dfs(target, combine, idx + 1)
+        // 选择当前数
+        if (target - candidates[idx] >= 0) {
+            dfs(target - candidates[idx], [candidates[idx], ...combine], idx)
         }
     }
-    for (const i in basicFs) {
-        inotons[inotonations[i]].basicFreqs = basicFs[i]
-    }
-    console.log(inotons)
+    dfs(target, [], 0)
+    ans = ans.length > 0 ? ans : s.length > 0 ? s : f
+    console.log(ans)
+    return ans.filter(a => a.length === smallest).sort((a, b) => b[0] - a[0])[0]
 }
 
 const getBasicRatioOfKey = (freqRatios: BasicInotonationSequence, target: keyof BasicInotonationSequence): number => {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as Tone from "tone";
 import { Samples } from "../shared/samples";
-import { minCombination, allKeys, Key, updateBasicInotonations, init, freqs, toneShift } from "~/shared/temperament";
+import { Key, inotonationInit, getFreqs, keyShift } from "~/shared/inotonation";
 
 definePageMeta({
     layout: "keyboard"
@@ -20,22 +20,22 @@ const release = (note: string) => {
 }
 
 
-init()
-updateBasicInotonations(Key.E)
-updateBasicInotonations(Key["C#"])
-// updateBasicInotonations(Key["G#"])
-// updateBasicInotonations(Key.F)
-// updateBasicInotonations(Key.A)
-console.log(freqs(["C3", "Eb4", "G4", "G#4"]))
+inotonationInit()
+keyShift(Key.E)
+keyShift(Key["C#"])
+// keyShift(Key["G#"])
+// keyShift(Key.F)
+// keyShift(Key.A)
+console.log(getFreqs(["C3", "Eb4", "G4", "G#4"]))
 // const res = toneShift("Eb")
 // console.log(`${res.flap}, ${allKeys[res.key]}`)
 
 onMounted(() => {
     synth = new Tone.Sampler({
-        urls: Samples.flute.files,
+        urls: Samples.piano.files,
         release: 1,
         // attack: 0.1,
-        baseUrl: 'https://tones.inspiral.site/samples/flute/'
+        baseUrl: 'https://tones.inspiral.site/samples/piano/'
     }).toDestination();
 
     Tone.loaded().then(() => {
