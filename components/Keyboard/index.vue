@@ -59,7 +59,7 @@ function keyCodeToTone(keycode: string): string {
             return `${tone.tone}#${tone.octave}`;
         } else {
             const tone = getWhiteKeyTone(baseKeycode - 1);
-            return `${tone.tone}-${tone.octave}`;
+            return `${tone.tone}b${tone.octave}`;
         }
     } else {
         const whiteKeycode = getWhiteKeyTone(parseInt(keycode) - 1);
