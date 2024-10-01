@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as Tone from "tone";
 import { Samples } from "../shared/samples";
-import { conbinations, Key, updateBasicInotonations } from "~/shared/temperament";
+import { minCombination, Key, updateBasicInotonations, init, freqs } from "~/shared/temperament";
 
 definePageMeta({
     layout: "keyboard"
@@ -19,9 +19,14 @@ const release = (note: string) => {
     synth.triggerRelease([note])
 }
 
-// updateBasicInotonations(Key.A)
 
-console.log(conbinations([1,2,3,4,7], 11))
+init()
+// updateBasicInotonations(Key.G)
+// updateBasicInotonations(Key["C#"])
+// updateBasicInotonations(Key["G#"])
+// updateBasicInotonations(Key.F)
+// updateBasicInotonations(Key.A)
+console.log(freqs(["C4", "Eb4", "G4"]))
 
 onMounted(() => {
     synth = new Tone.Sampler({
