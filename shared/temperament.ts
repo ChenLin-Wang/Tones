@@ -1,11 +1,13 @@
 const basicKeys: (keyof BasicInotonationSequence)[] = ["A", "B", "C", "D", "E", "F", "G"]
 const inotonations: (keyof Inotonation)[] = ["Just", "Equal"]
-const allKeys: ((keyof BasicInotonationSequence) | string)[] = ["A", "A#", "Bb", "B", "C", "C#", "Db", "D", "D#", "Eb", "E", "F", "F#", "Gb", "G", "G#", "Ab"]
+const allKeys: ((keyof BasicInotonationSequence) | string)[] = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
 var baseFreq = 220
 export enum Key {
     "A" = 0, "A#" = 1, "Bb" = 1, "B" = 2, "C" = 3, "C#" = 4, "Db" = 4, "D" = 5, "D#" = 6, "Eb" = 6, "E" = 7, "F" = 8, "F#" = 9, "Gb" = 9, "G" = 10, "G#" = 11, "Ab" = 11
 }
-export var baseKey: Key | null = null
+export var baseKey = Key.A
+var dependedKey: keyof BasicInotonationSequence = "A"
+var offsetRatio = 1
 
 type Inotonation = {
     Just: FreqBlock,
@@ -57,10 +59,11 @@ const inotons: Inotonation = {
                 2: 9/8,         // major second
                 3: 6/5,         // minor third
                 4: 5/4,         // major third
+                5: 4/3,         // perfect forth
                 7: 3/2,         // perfect fifth
             },
             detect: true,
-            seqs: [7, 4, 3, 2, 1]
+            seqs: [7, 5, 4, 3, 2, 1]
         }
     },
     Equal: {
@@ -97,7 +100,7 @@ const getKeyTransferRatio = (key: Key, freqs: BasicFreqs, intervals: Interval): 
 
     if (allKeys[key] in freqs) {
         
-        
+
 
 
 
@@ -114,7 +117,7 @@ const getKeyTransferRatio = (key: Key, freqs: BasicFreqs, intervals: Interval): 
     }
 }
 
-export const conbinations = (candidates: number[], target: number): number[] => {
+export const minCombination = (candidates: number[], target: number): number[] => {
     const ans: number[][] = []
     var t = 5
     var smallest = candidates.length
@@ -139,8 +142,32 @@ export const conbinations = (candidates: number[], target: number): number[] => 
 }
 
 export const updateBasicInotonations = (key: Key): void => {
-    if (baseKey === key) return
+    if (baseKey === key || baseKey === null) return
+    var ratio: number
+    var offset: number
+    if (allKeys[key] in inotons.Just.basic) {
+        const k = allKeys[key] as keyof BasicInotonationSequence
+        ratio = getBasicRatioOfKey(inotons.Just.basic, k) / (getBasicRatioOfKey(inotons.Just.basic, dependedKey) * offsetRatio)
+        dependedKey = k
+        offsetRatio = 1
+        // offset = key -
+    } else {
+        const gap = key - Key[dependedKey]
+        const combs = minCombination(inotons.Just.intervals.seqs, gap)
+        var ratio = 1
+        for (const r of combs) {
+            ratio *= inotons.Just.intervals.ins[r]
+        }
+        offsetRatio = ratio
+        ratio /= offsetRatio
+    }   
+
+
+
     baseKey = key
+}
+
+export const init = (): void => {
     var basicFs: BasicFreqs[] = []
     for (const name of inotonations) {
         basicFs.push({A: baseFreq, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0})
@@ -153,13 +180,18 @@ export const updateBasicInotonations = (key: Key): void => {
         }
     }
     for (const i in basicFs) {
-        const curIon = inotons[inotonations[i]]
-        const ratio = curIon.intervals.detect ? curIon.intervals.ins[key] : Math.pow(curIon.intervals.ins[1], key)
-        
-        
-
-        curIon.basicFreqs = basicFs[i]
+        inotons[inotonations[i]].basicFreqs = basicFs[i]
     }
+}
 
-    console.log(inotons)
+const getBasicRatioOfKey = (freqRatios: BasicInotonationSequence, target: keyof BasicInotonationSequence): number => {
+    var basedKey = target
+    var ratio = 1
+    while(true) {
+        const curSeq = freqRatios[basedKey]
+        basedKey = curSeq[0]
+        if (basedKey === basicKeys[0]) break
+        ratio *= curSeq[1]
+    }
+    return ratio
 }
