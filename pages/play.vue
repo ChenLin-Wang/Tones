@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import * as Tone from "tone";
-import { Samples } from "./samples";
+import { Samples } from "../shared/samples";
+
+definePageMeta({
+    layout: "keyboard"
+})
 
 var synth: Tone.Sampler
 

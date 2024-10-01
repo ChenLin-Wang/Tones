@@ -12,7 +12,6 @@ onMounted(setCSSVariables)
 <style lang="css" scoped>
 .bar-title {
     font-family: var(--brand-title);
-    font-size: 50px;
     font-weight: 400;
     cursor: pointer; /* 改变鼠标指针 */
     transition: color 0.3s; /* 添加过渡效果 */

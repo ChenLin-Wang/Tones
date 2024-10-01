@@ -1,6 +1,6 @@
 <template>
     <v-parallax class="grow contents bgimage">
-        <v-app-bar elevation="6" color="white" height="80">
+        <v-app-bar class="icon-title" elevation="6" color="white" height="80">
             <Header />
         </v-app-bar>
         <v-main>
@@ -10,6 +10,10 @@
 </template>
 
 <style lang="css" scoped>
+
+.icon-title {
+    font-size: 30px;
+}
 
 .bgimage {
     background-color: #ffffff;
