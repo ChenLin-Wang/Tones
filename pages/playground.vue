@@ -16,7 +16,7 @@ const release = (note: string) => {
 
 onMounted(() => {
     synth = new Tone.Sampler({
-        urls: Samples.flute,
+        urls: Samples.flute.files,
         release: 1,
         // attack: 0.1,
         baseUrl: 'https://tones.inspiral.site/samples/flute/'
