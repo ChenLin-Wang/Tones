@@ -8,7 +8,7 @@ export enum Key {
 }
 export var baseKey = Key.A
 
-type Inotonation = {
+export type Inotonation = {
     Just: FreqBlock,
     Equal: FreqBlock
 }
@@ -76,7 +76,7 @@ const inotons: Inotonation = {
     Equal: {
         basic: {
             A: ["A", 1],
-            B: ["A", Math.pow(2, 1 / 12)],
+            B: ["A", Math.pow(2, 2 / 12)],
             C: ["A", Math.pow(2, 3 / 12)],
             D: ["C", Math.pow(2, 2 / 12)],
             E: ["C", Math.pow(2, 4 / 12)],
@@ -92,6 +92,10 @@ const inotons: Inotonation = {
         dependedKey: "A",
         offsetRatio: 1
     }
+}
+
+export const toMinor = (key: Key): Key => {
+    return (key - 3) % 12
 }
 
 export const inotonationInit = (): void => {
@@ -131,6 +135,7 @@ export const getFreqs = (tones: string[]): number[][] => {
                 if (!inotons[inotName].basicFreqs) return []
                 const t = inotons[inotName].basicFreqs[allKeys[key] as keyof BasicFreqs]
                 ts.push((flap ? t / 2 : t) * octaveGap)
+                // console.log(inotonations)
             }
             res.push(ts)
             semiTones.push(null)
@@ -189,6 +194,7 @@ export const getFreqs = (tones: string[]): number[][] => {
         }
         res[i] = (ts)
     }
+    console.log(res)
     return res
 }
 
@@ -269,7 +275,7 @@ const minCombination = (candidates: number[], target: number): number[] => {
     dfs(target, [], 0)
     ans = ans.length > 0 ? ans : s.length > 0 ? s : f
     // console.log(ans)
-    return ans.filter(a => a.length === smallest).sort((a, b) => b[0] - a[0])[0]
+    return ans.filter(a => a.length === smallest).slice().sort((a, b) => b[0] - a[0])[0]
 }
 
 const getBasicRatioOfKey = (freqRatios: BasicInotonationSequence, target: keyof BasicInotonationSequence): number => {

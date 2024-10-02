@@ -10,6 +10,7 @@ const whiteShortKeys = "12345ASDFGHJKL;'67890"
 const blackLeftShortKeys = "     qw rt uio [] "
 const blackRightShortKeys = "      z cv nm, / "
 const scrollOffset = 0
+const keyWidth = 50
 const emit = defineEmits<{
     (e: 'attack', note: string): void;
     (e: 'release', note: string): void;
@@ -61,14 +62,14 @@ const scrollAdjust = (live: boolean = true) => {
     // const scrollI = scrollIndex.value?.i
     var update = false
     if (live) {
-        scrollView.scrollLeft = ((scrollIndex.value?.i ?? 4) * 7 + scrollOffset) * 60
+        scrollView.scrollLeft = ((scrollIndex.value?.i ?? 4) * 7 + scrollOffset) * keyWidth
         update = true
     } else {
-        // console.log(`${scrollIndex.value?.i}, ${Math.round((scrollView.scrollLeft / 60 - scrollOffset) / 7)}`)
-        if (scrollIndex.value && scrollIndex.value?.i !== (Math.round((scrollView.scrollLeft / 60 - scrollOffset) / 7))) {
-            scrollIndex.value.i = Math.round((scrollView.scrollLeft / 60 - scrollOffset) / 7)
+        // console.log(`${scrollIndex.value?.i}, ${Math.round((scrollView.scrollLeft / keyWidth - scrollOffset) / 7)}`)
+        if (scrollIndex.value && scrollIndex.value?.i !== (Math.round((scrollView.scrollLeft / keyWidth - scrollOffset) / 7))) {
+            scrollIndex.value.i = Math.round((scrollView.scrollLeft / keyWidth - scrollOffset) / 7)
             scrollIndex.value.d = false
-            // console.log(`test: ${scrollIndex.value.i}, ${Math.round((scrollView.scrollLeft / 60 - scrollOffset) / 7)}`)
+            // console.log(`test: ${scrollIndex.value.i}, ${Math.round((scrollView.scrollLeft / keyWidth - scrollOffset) / 7)}`)
             update = true
         }
     }
@@ -278,9 +279,9 @@ const mouseUp = (e: MouseEvent) => {
 <style lang="css" scoped>
 .scrollview {
     position: sticky;
-    --key-width: 60px;
-    --key-gap: 4px;
-    --white-key-height: 300px;
+    --key-width: 50px;
+    --key-gap: 2px;
+    --white-key-height: 220px;
     --white-key-width: calc(var(--key-width) * 1 - var(--key-gap));
     --black-key-width: calc(var(--key-width) * 0.4 - var(--key-gap));
     --black-key-height: calc(var(--white-key-height) * 0.6);
