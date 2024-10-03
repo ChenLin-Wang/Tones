@@ -34,12 +34,14 @@ const nextBar = () => {
 }
 
 const keyDown = (e: KeyboardEvent) => {
-    if (e.key === "ArrowLeft") previousBar()
-    else if (e.key === "ArrowRight") nextBar()
+    if (e.repeat) return
+    if (e.key === "`") previousBar()
+    else if (e.key === "1") nextBar()
     else (keyboard.value as any).keyDown(e.key)
 }
 
 const keyUp = (e: KeyboardEvent) => {
+    if (e.repeat) return
     (keyboard.value as any).keyUp(e.key)
 }
 

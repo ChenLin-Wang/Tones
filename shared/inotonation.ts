@@ -14,6 +14,7 @@ export type Inotonation = {
 }
 
 interface Ins { [Key: number]: number; }
+interface InsDescription { [Key: number]: {name: string, relation: string}; }
 
 type FreqBlock = {
     basic: BasicInotonationSequence,
@@ -25,6 +26,7 @@ type FreqBlock = {
 
 type Interval = {
     ins: Ins,
+    insDescriptions: InsDescription,
     detect: boolean,
     seqs: number[],
     keyShiftSeqs: number[]
@@ -66,6 +68,14 @@ const inotons: Inotonation = {
                 5: 4 / 3,         // perfect forth
                 7: 3 / 2,         // perfect fifth
             },
+            insDescriptions: {
+                1: {name: "Minor-2", relation: "16/15"},
+                2: {name: "Major-2", relation: "9/8"},
+                3: {name: "Minor-3", relation: "6/5"},
+                4: {name: "Major-3", relation: "5/4"},
+                5: {name: "Perfect-4", relation: "4/3"},
+                7: {name: "Perfect-5", relation: "3/2"},
+            },
             detect: true,
             seqs: [1, 2, 7, 5, 4, 3],
             keyShiftSeqs: [1, 2, 4, 3, 5, 7]
@@ -85,6 +95,7 @@ const inotons: Inotonation = {
         },
         intervals: {
             ins: { 1: Math.pow(2, 1 / 12) },
+            insDescriptions: {1: {name: "Minor-2", relation: "2^(1/12)"}},
             detect: false,
             seqs: [1],
             keyShiftSeqs: [1]
@@ -94,9 +105,9 @@ const inotons: Inotonation = {
     }
 }
 
-export const toMinor = (key: Key): Key => {
-    return (key - 3) % 12
-}
+export const isSemiTone = (tone: string) => tone.length < 2 ? false : "#b".includes(tone[1])
+
+export const toMinor = (key: Key): Key => (key - 3) % 12
 
 export const inotonationInit = (): void => {
     baseKey = Key.A
@@ -119,8 +130,8 @@ export const inotonationInit = (): void => {
     // console.log(inotons)
 }
 
-export const getFreqs = (tones: string[]): number[][] => {
-    var res: number[][] = []
+export const getFreqs = (tones: string[]): {fs: number[], rels: ({based: string, r: string[]})[]}[] => {
+    var res: {fs: number[], rels: {based: string, r: string[]}[]}[] = []
     var basicTones: number[] = []
     var semiTones: ({ oct: number, flap: boolean, tone: number } | null)[] = []
     for (const t of tones) {
@@ -137,11 +148,11 @@ export const getFreqs = (tones: string[]): number[][] => {
                 ts.push((flap ? t / 2 : t) * octaveGap)
                 // console.log(inotonations)
             }
-            res.push(ts)
+            res.push({fs: ts, rels: []})
             semiTones.push(null)
         } else {
             semiTones.push({ oct: octaveGap, flap: flap, tone: key })
-            res.push([])
+            res.push({fs: [], rels: []})
         }
     }
 
@@ -149,6 +160,7 @@ export const getFreqs = (tones: string[]): number[][] => {
         if (!semiTones[i]) continue
         const { oct, flap, tone: s } = semiTones[i]
         var ts: number[] = []
+        var rels: {based: string, r: string[]}[] = []
         for (const inoName of inotonations) {
             const inot = inotons[inoName]
             if (inot.intervals.detect) {
@@ -177,22 +189,32 @@ export const getFreqs = (tones: string[]): number[][] => {
                 }
                 if (fitGap && fitTone && inot.basicFreqs) {
                     ts.push(inot.basicFreqs[allKeys[fitTone] as keyof BasicFreqs] * (fitGap > 0 ? inot.intervals.ins[fitGap] : 1 / inot.intervals.ins[-fitGap]) / (flap ? 2 : 1) * oct)
+                    const des = inot.intervals.insDescriptions[Math.abs(fitGap)]
+                    rels.push({based: allKeys[fitTone], r: [des.name + "(" + des.relation + ")"]})
                 } else if (minGap && minGapTone && inot.basicFreqs) {
                     var freq = inot.basicFreqs[allKeys[minGapTone] as keyof BasicFreqs]
+                    var des: string[] = []
                     for (const i of minCombination(inot.intervals.seqs, Math.abs(minGap))) {
                         freq *= minGap > 0 ? inot.intervals.ins[i] : 1 / inot.intervals.ins[i]
+                        const d = inot.intervals.insDescriptions[i]
+                        des.push(d.name + "(" + d.relation + ")")
                     }
                     ts.push(freq / (flap ? 2 : 1) * oct)
+                    rels.push({based: allKeys[minGapTone], r: des})
                 } else if (inot.basicFreqs) {
                     ts.push(inot.intervals.ins[1] * inot.basicFreqs[allKeys[s - 1] as keyof BasicFreqs] / (flap ? 2 : 1) * oct)
+                    const des = inot.intervals.insDescriptions[1]
+                    rels.push({based: allKeys[s - 1], r: [des.name + "(" + des.relation + ")"]})
                 }
             } else {
                 if (inot.basicFreqs) {
                     ts.push(inot.intervals.ins[1] * inot.basicFreqs[allKeys[s - 1] as keyof BasicFreqs] / (flap ? 2 : 1) * oct)
+                    const des = inot.intervals.insDescriptions[1]
+                    rels.push({based: allKeys[s - 1], r: [des.name + "(" + des.relation + ")"]})
                 }
             }
         }
-        res[i] = (ts)
+        res[i] = {fs: ts, rels: rels}
     }
     // console.log(res)
     return res

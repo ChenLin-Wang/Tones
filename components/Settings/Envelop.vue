@@ -9,7 +9,7 @@ const envelop = defineModel<{ attack: number, release: number }>()
         </v-row>
         <v-row class="mt-2" no-gutters>
             <v-col class="my-6" cols="12">
-                <v-slider class="pl-2" append-icon="mdi-knob" v-model="envelop.attack" label="Attack" max="20" min="0" step="0.1" hide-details
+                <v-slider append-icon="mdi-knob" v-model="envelop.attack" label="&nbsp;&nbsp;&nbsp;Attack" max="20" min="0" step="0.1" hide-details
                     thumb-label></v-slider>
             </v-col>
             <v-col class="my-6" cols="12">
