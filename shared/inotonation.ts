@@ -194,7 +194,7 @@ export const getFreqs = (tones: string[]): number[][] => {
         }
         res[i] = (ts)
     }
-    console.log(res)
+    // console.log(res)
     return res
 }
 
