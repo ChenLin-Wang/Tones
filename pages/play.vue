@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as Tone from "tone";
 import { Samples } from "../shared/samples";
-import { Key, inotonationInit, getFreqs, keyShift, toMinor, allKeys, baseKey, isSemiTone } from "~/shared/inotonation";
+import { Key, inotonationInit, getFreqs, keyShift, toMinor, allKeys, baseKey, isSemiTone, relativeNote, absoluteNote } from "~/shared/inotonation";
 import type { InotonationParas } from "~/components/Settings/Iontonation.vue";
 
 definePageMeta({
@@ -18,14 +18,17 @@ const tones = ref([] as { note: string, freq: number }[])
 const semiTones = ref([] as {note: string, based?: string, r: string[]}[])
 
 const attack = (note: string) => {
-    console.log(note)
-    if (tones.value.find(a => a.note === note)) return
-    const res = getFreqs(tones.value.map(a => a.note).concat(note))
+    const rNote = relativeNote(note)
+    if (tones.value.find(a => a.note === rNote)) return
+    const res = getFreqs(tones.value.map(a => absoluteNote(a.note)).concat(note))
     const freqs = res
     const i = inotonation.value.inot === "Just" ? 0 : 1
     const f = res[freqs.length - 1].fs[i]
-    tones.value.push({ note: note, freq: f })
-    if (isSemiTone(note)) semiTones.value.push({note: note, based: res[freqs.length - 1].rels[i].based, r: res[freqs.length - 1].rels[i].r})
+    console.log(`attack: ${rNote}: ${f}`)
+    tones.value.push({ note: rNote, freq: f })
+    // console.log(tones.value)
+    // console.log(res)
+    if (isSemiTone(rNote)) semiTones.value.push({note: rNote, based: res[freqs.length - 1].rels[i].based, r: res[freqs.length - 1].rels[i].r})
     synth.triggerAttack(f, '+' + envelop.value.attack)
     // const frqs = getFreqs(tones).map(a => a[inotonation.value.inot === "Just" ? 0 : 1])
     // console.log(`attack: ${inotonation.value.inot} ${frqs}, ${allKeys[baseKey]}`)
@@ -40,10 +43,12 @@ const attack = (note: string) => {
 }
 
 const release = (note: string) => {
-    console.log(`release: ${note}`)
-    const f = tones.value.find(a => a.note === note)?.freq
-    tones.value = tones.value.filter(a => a.note !== note)
-    semiTones.value = semiTones.value.filter(a => a.note !== note)
+    const rNote = relativeNote(note)
+    // console.log(tones.value)
+    const f = tones.value.find(a => a.note === rNote)?.freq
+    console.log(`release: ${rNote}: ${f}`)
+    tones.value = tones.value.filter(a => a.note !== rNote)
+    semiTones.value = semiTones.value.filter(a => a.note !== rNote)
     if (f) synth.triggerRelease(f, '+' + envelop.value.release)
     else console.log("No release key")
 }

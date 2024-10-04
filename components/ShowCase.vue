@@ -15,7 +15,7 @@ const props = defineProps<{
                 <v-container class="py-2" style="height: 100%;" fluid align="center" justfiy="center">
                     <v-row no-gutters style="height:50%">
                         <h4>Frequencies:&nbsp;&nbsp;</h4>
-                        <v-chip v-for="frq in freqs" :color="isSemiTone(frq.note) ? 'orange' : 'green'" style="height: 24px;">
+                        <v-chip v-for="frq in freqs.slice().sort((a, b) => a.note.localeCompare(b.note) )" :color="isSemiTone(frq.note) ? 'orange' : 'green'" style="height: 24px;">
                             {{ frq.note + ": " + frq.freq }}
                         </v-chip>
                         <v-chip v-if="freqs.length === 0" color="red"style="height: 24px;">No Tones</v-chip>
