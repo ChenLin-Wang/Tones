@@ -58,18 +58,14 @@ onMounted(() => {
 })
 
 const scrollAdjust = (live: boolean = true) => {
-    // const position = scrollView.scrollLeft
-    // const scrollI = scrollIndex.value?.i
     var update = false
     if (live) {
         scrollView.scrollLeft = ((scrollIndex.value?.i ?? 4) * 7 + scrollOffset) * keyWidth
         update = true
     } else {
-        // console.log(`${scrollIndex.value?.i}, ${Math.round((scrollView.scrollLeft / keyWidth - scrollOffset) / 7)}`)
         if (scrollIndex.value && scrollIndex.value?.i !== (Math.round((scrollView.scrollLeft / keyWidth - scrollOffset) / 7))) {
             scrollIndex.value.i = Math.round((scrollView.scrollLeft / keyWidth - scrollOffset) / 7)
             scrollIndex.value.d = false
-            // console.log(`test: ${scrollIndex.value.i}, ${Math.round((scrollView.scrollLeft / keyWidth - scrollOffset) / 7)}`)
             update = true
         }
     }
@@ -85,7 +81,6 @@ const scrollAdjust = (live: boolean = true) => {
 const keyDown = (k: string) => {
     for (const l of [...whiteLabels, ...blackLeftLabels, ...blackRightLabels]) {
         if (l.textContent?.toLowerCase() === k.toLowerCase() && !keyPressed.includes(k.toLowerCase())) {
-            // console.log(`key down: ${l.textContent}`)
             attack(undefined, l.id)
             keyPressed.push(k.toLowerCase())
         }
@@ -93,14 +88,10 @@ const keyDown = (k: string) => {
 }
 
 const keyUp = (k: string) => {
-    // console.log(k)
     for (const l of [...whiteLabels, ...blackLeftLabels, ...blackRightLabels]) {
         if (l.textContent?.toLowerCase() === k.toLowerCase()) {
-            // console.log(`key up: ${l.textContent}`)
             release(undefined, l.id)
-            // console.log(`1. ${keyPressed}, ${k.toLowerCase()}`)
             keyPressed = keyPressed.filter(s => s !== k.toLowerCase())
-            // console.log(`2. ${keyPressed}`)
         }
     }
 }
@@ -111,7 +102,6 @@ const attack = (e?: HTMLElement, note?: string) => {
         const n = note as string
         dom = (n.length < 3 ? whiteKeys : n.startsWith("1") ? blackSharpKeys : blackFlapKeys).filter(key => key.id === note)[0]
     }
-    // console.log(`attack: ${dom.id}`)
     if (dom.classList.contains("key-black-field-left-pressed")) return
     if (dom.id.length === 3) {
         // black keys
@@ -127,7 +117,6 @@ const release = (e?: HTMLElement, note?: string) => {
         const n = note as string
         dom = (n.length < 3 ? whiteKeys : n.startsWith("1") ? blackSharpKeys : blackFlapKeys).filter(key => key.id === note)[0]
     }
-    // console.log(`release: ${dom.id}`)
     if (dom.id.length === 3) {
         // black keys
         if (dom.id.startsWith("1")) dom.classList.remove("key-black-field-left-pressed") // #
@@ -139,7 +128,6 @@ const release = (e?: HTMLElement, note?: string) => {
 defineExpose({ keyDown, keyUp, attack, release })
 
 const labelUpdate = () => {
-    // console.log(scrollIndex.value?.i)
     var startI = (scrollIndex.value?.i ?? 3) * 7 - 4
     for (const wl of whiteLabels) {
         const i = parseInt(wl.id) - startI
@@ -161,48 +149,40 @@ const labelUpdate = () => {
 
 const pressKey = (e: MouseEvent) => {
     const k = e.currentTarget as HTMLElement
-    // console.log(k)
     if (mousePressed && k.getAttribute("pressed") === null) {
         k.setAttribute("pressed", "t")
         attack(k)
-        // console.log(`mouse pressed: ${k.id}`)
     }
 }
 
 const releaseKey = (e: MouseEvent) => {
     const k = e.currentTarget as HTMLElement
-    // console.log(`mouse releasing: ${k.id}`)
     if (k.getAttribute("pressed")) {
         k.removeAttribute("pressed")
         release(k)
-        // console.log(`mouse released: ${k.id}`)
     }
 }
 
 const mouseEnter = (e: MouseEvent) => {
     const k = e.currentTarget as HTMLElement
     pressKey(e)
-    // console.log(`mouse enter: ${k.id}`)
 }
 
 const mouseLeave = (e: MouseEvent) => {
     const k = e.currentTarget as HTMLElement
     releaseKey(e)
-    // console.log(`mouse leave: ${k.id}`)
 }
 
 const mouseDown = (e: MouseEvent) => {
     const k = e.currentTarget as HTMLElement
     mousePressed = true
     pressKey(e)
-    // console.log(`mouse down: ${k.id}`)
 }
 
 const mouseUp = (e: MouseEvent) => {
     const k = e.currentTarget as HTMLElement
     mousePressed = false
     releaseKey(e)
-    // console.log(`mouse up: ${k.id}`)
 }
 
 </script>

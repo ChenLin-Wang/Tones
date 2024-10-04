@@ -24,19 +24,14 @@ const attack = (note: string) => {
     const freqs = res
     const i = inotonation.value.inot === "Just" ? 0 : 1
     const f = res[freqs.length - 1].fs[i]
-    console.log(`attack: ${rNote}: ${f}`)
     tones.value.push({ note: rNote, freq: f })
-    // console.log(tones.value)
-    console.log(res)
     if (isSemiTone(rNote)) semiTones.value.push({ note: rNote, based: res[freqs.length - 1].rels[i].based, r: res[freqs.length - 1].rels[i].r })
     synth.triggerAttack(f, '+' + envelop.value.attack)
 }
 
 const release = (note: string) => {
     const rNote = relativeNote(note)
-    // console.log(tones.value)
     const f = tones.value.find(a => a.note === rNote)?.freq
-    console.log(`release: ${rNote}: ${f}`)
     tones.value = tones.value.filter(a => a.note !== rNote)
     semiTones.value = semiTones.value.filter(a => a.note !== rNote)
     if (f) synth.triggerRelease(f, '+' + envelop.value.release)
@@ -52,19 +47,16 @@ onMounted(() => {
 watch(inotonation.value, n => {
     var key = Key[n.key as keyof typeof Key]
     if (n.mode === "Major") key = toMinor(key)
-    console.log(`${n.mode} ${n.key} to ${key}`)
     keyShift(key)
     tones.value = []
     semiTones.value = []
 })
 
 const shiftKeyDown = (): void => {
-    console.log("shiftKeyDown")
     inotonation.value.inot = "Equal"
 }
 
 const shiftKeyUp = (): void => {
-    console.log("shiftKeyUp")
     inotonation.value.inot = "Just"
 }
 

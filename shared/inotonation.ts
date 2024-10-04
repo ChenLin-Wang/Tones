@@ -141,7 +141,6 @@ export const absoluteNote = (note: string): string => {
 const toneShift = (tone: string, bk: Key = baseKey, goMajor: boolean = false): { flap: boolean, key: Key } => {
     const key = tone as keyof typeof Key
     const gap = Key[key] - bk - (goMajor ? 3 : 0)
-    // console.log(`gap: ${gap}`)
     return gap >= 0 ? { flap: false, key: gap } : { flap: true, key: 12 + gap }
 }
 
@@ -163,7 +162,6 @@ export const inotonationInit = (): void => {
     for (const i in basicFs) {
         inotons[inotonations[i]].basicFreqs = basicFs[i]
     }
-    // console.log(inotons)
 }
 
 export const getFreqs = (tones: string[]): {fs: number[], rels: ({based: string, r: string[]})[]}[] => {
@@ -176,15 +174,12 @@ export const getFreqs = (tones: string[]): {fs: number[], rels: ({based: string,
         const nOct = parseInt(t[t.length - 1])
         const oOct = octaves[Key[tempK as keyof typeof Key]]
         const octDistance = nOct - oOct - (flap ? 1 : 0)
-        // console.log("key: " + allKeys[key])
-        // console.log(`${t.slice(0, -1)}, ${flap}, ${allKeys[key]}, ${Math.pow(2, parseInt(t[t.length - 1]) - octaves[Key[tempK as keyof typeof Key]])}`)
         if (basicKeys.includes(allKeys[key] as keyof BasicInotonationSequence)) {
             var ts: number[] = []
             for (const inotName of inotonations) {
                 if (!inotons[inotName].basicFreqs) return []
                 const t = inotons[inotName].basicFreqs[allKeys[key] as keyof BasicFreqs]
                 ts.push(t * Math.pow(2, octDistance))
-                // console.log(inotonations)
             }
             basicTones.push({oct: octDistance, tone: key})
             res.push({fs: ts, rels: []})
@@ -194,10 +189,6 @@ export const getFreqs = (tones: string[]): {fs: number[], rels: ({based: string,
             res.push({fs: [], rels: []})
         }
     }
-    // console.log("basics")
-    // console.log(res)
-    // console.log(semiTones)
-
     for (const i in semiTones) {
         if (!semiTones[i]) continue
         const { oct, tone: s } = semiTones[i]
@@ -240,19 +231,12 @@ export const getFreqs = (tones: string[]): {fs: number[], rels: ({based: string,
                         }
                     }
                 }
-                // console.log("-------------")
-                // console.log(`fitGap: ${fitGap}, fitTone: ${fitTone}, fitTransUp: ${fit_transUp}`)
-                // console.log(`maxGap: ${maxGap}, maxGapTone: ${maxGapTone}, maxGapTransUp: ${maxGap_transUp}`)
-                // console.log("-------------")
                 if (fitGap) {
-                    // console.log(fit_transUp)
                     const bf = bFs[allKeys[fitTone] as keyof BasicFreqs] * Math.pow(2, oct)
                     const delta = (fitGap > 0 ? inot.intervals.ins[fitGap] : 1 / inot.intervals.ins[-fitGap])
                     ts.push( fit_transUp === null ? bf * delta : fit_transUp ? (bf * 2 / delta) : (bf / 2 * delta) )
                     const des = inot.intervals.insDescriptions[Math.abs(fitGap)]
                     rels.push({based: allKeys[fitTone], r: [des.name + "(" + des.relation + ")"]})
-                    // console.log("semi")
-                    // console.log(fit_transUp === null ? bf * delta : fit_transUp ? (bf * 2 / delta) : (bf / 2 * delta))
                 } else if (maxGap) {
                     var delta = 1
                     var des: string[] = []
@@ -277,12 +261,10 @@ export const getFreqs = (tones: string[]): {fs: number[], rels: ({based: string,
         }
         res[i] = {fs: ts, rels: rels}
     }
-    // console.log(res)
     return res
 }
 
 export const keyShift = (key: Key): void => {
-    // console.log(`to ${allKeys[key]}`)
     if (baseKey === key || baseKey === null) return
     for (const i of inotonations) {
         const ino = inotons[i]
@@ -291,7 +273,6 @@ export const keyShift = (key: Key): void => {
         if (allKeys[key] in ino.basic) {
             const k = allKeys[key] as keyof BasicInotonationSequence
             ratio = getBasicRatioOfKey(ino.basic, k) / (getBasicRatioOfKey(ino.basic, ino.dependedKey) * ino.offsetRatio)
-            // console.log(`dependedkey: ${dependedKey}`)
             ino.dependedKey = k
             ino.offsetRatio = 1
         } else {
@@ -299,7 +280,6 @@ export const keyShift = (key: Key): void => {
             var old: number
             if (ino.intervals.detect) {
                 const combs = minCombination(ino.intervals.keyShiftSeqs, Math.abs(gap))
-                // console.log(`comb: ${combs} ${ino.intervals.seqs}--${Math.abs(gap)}`)
                 ratio = 1
                 for (const r of combs) {
                     ratio = gap > 0 ?
@@ -307,7 +287,6 @@ export const keyShift = (key: Key): void => {
                         (r > 0 ? (ratio / ino.intervals.ins[r]) : (ratio * ino.intervals.ins[r]))
                 }
                 old = ratio
-                // console.log(`ratio: ${ratio} ${offsetRatio}`)
             } else {
                 ratio = Math.pow(ino.intervals.ins[1], gap)
                 old = ratio
@@ -321,8 +300,6 @@ export const keyShift = (key: Key): void => {
             }
         }
     }
-    // console.log(inotons)
-
     const noChangeKeys = allKeys.slice(0, 12 - key)
     const changingKeys = allKeys.slice(12 - key)
     var octs = octaves.slice(0, 12 - key)
@@ -358,7 +335,6 @@ const minCombination = (candidates: number[], target: number): number[] => {
     }
     dfs(target, [], 0)
     ans = ans.length > 0 ? ans : s.length > 0 ? s : f
-    // console.log(ans)
     return ans.filter(a => a.length === smallest).slice().sort((a, b) => b[0] - a[0])[0]
 }
 
@@ -371,6 +347,5 @@ const getBasicRatioOfKey = (freqRatios: BasicInotonationSequence, target: keyof 
         ratio *= curSeq[1]
         if (basedKey === basicKeys[0]) break
     }
-    // console.log(`${target} ${ratio}`)
     return ratio
 }

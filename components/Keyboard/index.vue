@@ -21,7 +21,6 @@ defineExpose({ attack, release })
 onMounted(() => {
     nextTick(() => {
         border = document.querySelectorAll('.border')[0] as HTMLElement;
-        // console.log(keyboard.value)
         border.addEventListener('keydown', keyDown)
         border.addEventListener('keyup', keyUp)
     })
