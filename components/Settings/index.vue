@@ -2,7 +2,7 @@
 import { type Inotonation } from "~/shared/inotonation";
 import type { Samples } from "~/shared/samples";
 const emit = defineEmits<{ (e: "instrumentChange", instrument: keyof typeof Samples): void }>()
-const envelop = defineModel<{ attack: number, release: number }>("envelop")
+const envelop = defineModel<{ attack: number, decay: number, sustain: number, release: number }>("envelop")
 const inotonation = defineModel<{
     key: string,
     mode: 'Major' | 'Minor',
@@ -43,17 +43,25 @@ const inotonation = defineModel<{
     height: 100%;
     border-top-left-radius: 20px;
     border-bottom-left-radius: 20px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 
 .card-2 {
     width: 100%;
     height: 100%;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
     border-top-right-radius: 20px;
+    border-bottom-right-radius: 10px;
 }
 
 .card-3 {
     width: 100%;
     height: 100%;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-top-right-radius: 10px;
     border-bottom-right-radius: 20px;
 }
 

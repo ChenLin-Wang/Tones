@@ -1,5 +1,5 @@
 <template>
-    <v-parallax class="grow contents bgimage">
+    <v-parallax src="https://cdn.vuetifyjs.com/images/parallax/material.jpg">
         <v-app-bar class="icon-title" elevation="6" color="white" height="80">
             <Header />
         </v-app-bar>

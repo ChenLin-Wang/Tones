@@ -7,6 +7,10 @@ const keyboard = ref(null)
 const emit = defineEmits<{
     (e: 'attack', note: string): void;
     (e: 'release', note: string): void;
+    (e: 'shiftKeyDown'): void;
+    (e: 'shiftKeyUp'): void;
+    (e: 'keyShiftUpKeyDown'): void;
+    (e: 'keyShiftDownKeyDown'): void;
 }>()
 
 const attack = (note: string) => (keyboard.value as any).attack(null, note)
@@ -35,13 +39,17 @@ const nextBar = () => {
 
 const keyDown = (e: KeyboardEvent) => {
     if (e.repeat) return
+    if (e.key === "\\") emit("shiftKeyDown")
+    if (e.key === "ArrowUp") emit("keyShiftUpKeyDown")
+    else if (e.key === "ArrowDown") emit("keyShiftDownKeyDown")
     if (e.key === "`") previousBar()
     else if (e.key === "1") nextBar()
     else (keyboard.value as any).keyDown(e.key)
 }
 
 const keyUp = (e: KeyboardEvent) => {
-    if (e.repeat) return
+    if (e.repeat) return;
+    if (e.key === "\\") emit("shiftKeyUp");
     (keyboard.value as any).keyUp(e.key)
 }
 

@@ -13,14 +13,14 @@ const props = defineProps<{
         <v-row no-gutters style="height: 100%; width: 100%;">
             <v-card class="card-1 bg-black" elevation="4" style="height: 100%; width: 100%; border-radius: 20px;">
                 <v-container class="py-2" style="height: 100%;" fluid align="center" justfiy="center">
-                    <v-row no-gutters style="height:50%">
+                    <v-row no-gutters style="height:50%; overflow: scroll;">
                         <h4>Frequencies:&nbsp;&nbsp;</h4>
                         <v-chip v-for="frq in freqs.slice().sort((a, b) => a.note.localeCompare(b.note) )" :color="isSemiTone(frq.note) ? 'orange' : 'green'" style="height: 24px;">
                             {{ frq.note + ": " + frq.freq }}
                         </v-chip>
                         <v-chip v-if="freqs.length === 0" color="red"style="height: 24px;">No Tones</v-chip>
                     </v-row>
-                    <v-row no-gutters style="height:50%">
+                    <v-row no-gutters style="height:50%; overflow: scroll;">
                         <h4>Semi-Tones:&nbsp;&nbsp;</h4>
                         <v-chip v-for="rels in halfToneRelations" :color="rels.based ? 'blue' : 'red'" style="height: 24px;">
                             {{ rels.note + (rels.based ? " --< " + rels.based : "") + ": " + rels.r.join(", ") }}
