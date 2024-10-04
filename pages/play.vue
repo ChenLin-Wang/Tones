@@ -4,9 +4,8 @@ import { Samples } from "../shared/samples";
 import { Key, inotonationInit, getFreqs, keyShift, toMinor, allKeys, baseKey, isSemiTone, relativeNote, absoluteNote } from "~/shared/inotonation";
 import type { InotonationParas } from "~/components/Settings/Iontonation.vue";
 
-definePageMeta({
-    layout: "keyboard"
-})
+definePageMeta({ layout: "keyboard" })
+useHead({ title: 'Tones' })
 
 var synth: Tone.Sampler
 

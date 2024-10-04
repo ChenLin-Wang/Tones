@@ -5,6 +5,7 @@ onMounted(setCSSVariables)
 const jumpToPlay = () => {
     useRouter().push("/play")
 }
+useHead({ title: 'Tones' })
 </script>
 
 <template>
@@ -14,6 +15,9 @@ const jumpToPlay = () => {
                 <v-card class="bg-white text-center mx-10 mt-10 mb-0 pa-5" elevation="12"
                     style="border-radius: 30px; height: calc(100% - 80px);">
                     <v-row class="fill-height" align="center" justify="center" no-gutters>
+                        <v-col class="mr-10" cols="auto">
+                            <v-img :width="300" src="/favicon.png"></v-img>
+                        </v-col>
                         <v-col cols="auto">
                             <h1 class="title">Tones</h1>
                         </v-col>
@@ -25,7 +29,8 @@ const jumpToPlay = () => {
             <v-col cols="text-center ma-0 pa-0">
                 <v-card class="bg-white mx-10 mt-0 mb-10 pa-0" elevation="12"
                     style="border-radius: 30px; height: calc(100% - 80px);">
-                    <v-btn @click="jumpToPlay" class="bg-white text-center ma-0 pa-5" style="width: 100%; height: 100%;">
+                    <v-btn @click="jumpToPlay" class="bg-white text-center ma-0 pa-5"
+                        style="width: 100%; height: 100%;">
                         <v-row class="fill-height" align="center" justify="center" no-gutters>
                             <v-col cols="auto">
                                 <h1 class="button-title">Play</h1>
