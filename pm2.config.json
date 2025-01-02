@@ -1,0 +1,13 @@
+{
+    "apps": [
+        {
+            "name": "tones",
+            "cwd": ".",
+            "script": ".output/server/index.mjs",
+            "interpreter": "node@23.1.0",
+            "env": {
+                "PORT": "9410"
+            }
+        }
+    ]
+}
